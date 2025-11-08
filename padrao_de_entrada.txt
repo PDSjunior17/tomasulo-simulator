@@ -1,0 +1,10 @@
+## Use os 3 inputs como exemplo ##
+## Cuidado com os nomes das operações, se tiver errado vai gerar loop
+    coloque ADDD, se colocar Add ou ADD_D dara errado 
+##
+## codigo tomasulo_saidaTerminal saida sera no terminal
+## codigo tomasulo_saidaArquivo tera um arquicvo como saida
+    coloque:
+    g++ nomedoarquivo.cpp -o nomedoarquivo
+    nomedoarquivo arquivodeentrada.txt nomedoarquivodesaida.txt (coloque o nome que quiser no arquivo de saida)
+##
