@@ -1,0 +1,16 @@
+CONFIG_BEGIN
+
+CYCLES ADDD 2
+CYCLES MULTD 4
+
+UNITS ADDD 2      # 2 unidades ADD (para paralelismo)
+UNITS MULTD 2     # 2 unidades MUL
+
+CONFIG_END
+
+INSTRUCTIONS_BEGIN
+ADDD F1 F2 F3     # Independente
+ADDD F4 F5 F6     # Independente (executa em paralelo)
+MULTD F7 F1 F4    # Depende de F1 e F4
+MULTD F8 F2 F5    # Independente (pode executar em paralelo com F7)
+INSTRUCTIONS_END
