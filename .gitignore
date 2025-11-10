@@ -1,0 +1,56 @@
+# Arquivos compilados
+*.o
+*.out
+*.exe
+tomasulo_simulator
+codigo
+codigo2
+
+# Diretórios de build
+build/
+bin/
+obj/
+dist/
+
+# Arquivos de saída
+output.txt
+output*.txt
+teste*.txt
+resultado*.txt
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Qt (caso adicione interface gráfica futuramente)
+*.pro.user
+*.autosave
+moc_*
+ui_*
+qrc_*
+
+# Temporários
+*.tmp
+*.log
+*.bak
+
+# Dependências
+*.d
+
+# Core dumps
+core
+core.*
+
+# Valgrind
+vgcore.*
+*.memcheck
+
+# Backup de editores
+*~
+\#*\#
+.\#*

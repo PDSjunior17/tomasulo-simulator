@@ -1,142 +1,323 @@
 # Tomasulo Algorithm Simulator
 
-A C++ implementation of Tomasulo's algorithm for dynamic instruction scheduling in superscalar processors.
+![C++](https://img.shields.io/badge/C++-11-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-## 📋 Overview
+> Simulador completo do algoritmo de Tomasulo para escalonamento dinâmico de instruções em processadores superescalares.
 
-This project simulates the Tomasulo algorithm, a hardware-based dynamic scheduling technique that enables out-of-order execution while preserving data dependencies. Originally developed by Robert Tomasulo in 1967 for the IBM System/360 Model 91, this algorithm remains fundamental to modern processor design.
+## 📋 Sobre o Projeto
 
-## ✨ Features
+Este projeto implementa o algoritmo de Tomasulo, uma técnica de escalonamento dinâmico desenvolvida por Robert Tomasulo em 1967 para o IBM System/360 Model 91. O simulador permite visualizar o funcionamento de execução fora de ordem, renomeação de registradores e resolução de dependências de dados em tempo de execução.
 
-- **Complete Tomasulo Implementation**: Full simulation of reservation stations, register renaming, and common data bus
-- **Cycle-by-Cycle Execution**: Step through the simulation one clock cycle at a time
-- **Comprehensive Visualization**: Display of reservation stations, register file status, and instruction pipeline
-- **Flexible Configuration**: Adjustable number of reservation stations and operation latencies
-- **Custom Instruction Sets**: Support for ADD, SUB, MUL, DIV, LOAD, and STORE operations
-- **Performance Metrics**: IPC (Instructions Per Cycle) calculation and execution statistics
+### Principais Características
 
-## 🏗️ Architecture
+- ✅ **Execução Fora de Ordem (Out-of-Order Execution)**: Instruções executam assim que seus operandos estão disponíveis
+- ✅ **Renomeação Dinâmica de Registradores**: Elimina dependências falsas (WAR e WAW)
+- ✅ **Buffer de Reordenação (ROB)**: Garante commits em ordem de programa
+- ✅ **Estações de Reserva**: Buffers dedicados para cada tipo de unidade funcional
+- ✅ **Common Data Bus (CDB)**: Broadcast de resultados para todas as unidades
+- ✅ **Configuração Flexível**: Latências e número de unidades ajustáveis
+- ✅ **Visualização Ciclo-a-Ciclo**: Acompanhe o estado completo do simulador
 
-The simulator implements three main stages of the Tomasulo algorithm:
+## 🏗️ Arquitetura
 
-1. **Issue**: Instructions are dispatched to available reservation stations
-2. **Execute**: Operations execute when operands are ready
-3. **Write Result**: Results are broadcast via the Common Data Bus (CDB)
+O simulador implementa as três fases principais do algoritmo de Tomasulo:
 
-## 🚀 Getting Started
+### 1. Issue (Despacho)
+- Instruções são despachadas para estações de reserva disponíveis
+- Renomeação de registradores acontece nesta fase
+- Stall se não houver RS livre ou ROB cheio
 
-### Prerequisites
+### 2. Execute (Execução)
+- Operações executam quando todos os operandos estão prontos
+- Respeita latências configuráveis para cada tipo de operação
+- Múltiplas instruções podem executar em paralelo
 
-- C++ compiler with C++11 support or higher (g++, clang++)
-- Make (optional, for using Makefile)
+### 3. Write Result (Escrita)
+- Resultados são transmitidos via CDB
+- Todas as unidades esperando por aquele resultado são notificadas
+- Estações de reserva são liberadas
 
-### Compilation
+### 4. Commit (Confirmação)
+- Instruções fazem commit em ordem de programa
+- Escritas em registradores/memória acontecem apenas aqui
+- ROB entry é liberada
+
+## 🚀 Compilação e Execução
+
+### Pré-requisitos
+
+- Compilador C++ com suporte a C++11 ou superior (g++, clang++)
+- Sistema operacional: Linux, macOS ou Windows
+
+### Compilação
+
 ```bash
-# Using Make
+# Compilar o simulador
+g++ -std=c++11 Tomasulo_saidaArquivo.cpp -o tomasulo_simulator
+
+# Ou use o Makefile (se disponível)
 make
-
-# Or directly with g++
-g++ -std=c++11 src/*.cpp -o tomasulo_simulator
 ```
 
-### Running
+### Execução
+
 ```bash
-./tomasulo_simulator <input_file.txt>
+# Sintaxe
+./tomasulo_simulator <arquivo_entrada.txt> <arquivo_saida.txt>
+
+# Exemplo
+./tomasulo_simulator input.txt output.txt
 ```
 
-### Input File Format
+A saída será salva no arquivo especificado e uma mensagem será exibida no console.
+
+## 📝 Formato do Arquivo de Entrada
+
+O arquivo de entrada possui duas seções principais:
+
+### 1. Configuração (CONFIG_BEGIN...CONFIG_END)
+
+Define latências de operações e número de unidades funcionais:
+
 ```
-ADD R1, R2, R3
-MUL R4, R1, R5
-LOAD R6, 100
-STORE R4, 200
+CONFIG_BEGIN
+
+CYCLES ADDD 2
+CYCLES SUBD 2
+CYCLES MULTD 4
+CYCLES DIVD 10
+CYCLES LD 2
+CYCLES SD 2
+
+UNITS ADDD 1
+UNITS MULTD 1
+UNITS DIVD 1
+
+MEM_UNITS LD 1
+MEM_UNITS SD 1
+
+CONFIG_END
 ```
 
-## 📊 Output
+**Parâmetros:**
+- `CYCLES <OPERACAO> <VALOR>`: Latência em ciclos para cada tipo de operação
+- `UNITS <OPERACAO> <VALOR>`: Número de estações de reserva para operações aritméticas
+- `MEM_UNITS <OPERACAO> <VALOR>`: Número de buffers para operações de memória
 
-The simulator displays cycle-by-cycle information including:
+### 2. Instruções (INSTRUCTIONS_BEGIN...INSTRUCTIONS_END)
 
-- Current cycle number
-- Reservation station status (Busy, Op, Vj, Vk, Qj, Qk)
-- Register file state (Value, Qi)
-- Instruction completion timeline
-- Final register values
-- Performance statistics
+Define o programa a ser simulado:
 
-## 🎓 Educational Purpose
-
-This project was developed as part of the Computer Architecture course at [Your University]. It demonstrates understanding of:
-
-- Instruction-level parallelism (ILP)
-- Dynamic scheduling techniques
-- Register renaming and hazard elimination
-- Superscalar processor architecture
-
-## 📚 References
-
-- Hennessy, J. L., & Patterson, D. A. *Computer Architecture: A Quantitative Approach*
-- Tomasulo, R. M. (1967). "An Efficient Algorithm for Exploiting Multiple Arithmetic Units"
-
-## 🤝 Contributing
-
-This is an academic project, but suggestions and improvements are welcome! Feel free to:
-
-- Report bugs
-- Suggest enhancements
-- Submit pull requests
-
-## 📝 License
-
-This project is available under the MIT License - see LICENSE file for details.
-
-## 👤 Author
-
-[Seu Nome]
-- GitHub: [@seu-usuario](https://github.com/seu-usuario)
-- LinkedIn: [Seu Perfil](https://linkedin.com/in/seu-perfil)
-
-## 🙏 Acknowledgments
-
-- Professor [Nome do Professor] for guidance and instruction
-- IBM for the original Tomasulo algorithm design
-- Course materials and references from Computer Architecture class
 ```
+INSTRUCTIONS_BEGIN
+ADDD F8 F4 F6    # F8 = F4 + F6
+MULTD F10 F8 F8  # F10 = F8 * F8
+SUBD F12 F10 F4  # F12 = F10 - F4
+INSTRUCTIONS_END
+```
+
+**Operações Suportadas:**
+- `ADDD Fd, Fs1, Fs2`: Soma de ponto flutuante
+- `SUBD Fd, Fs1, Fs2`: Subtração de ponto flutuante
+- `MULTD Fd, Fs1, Fs2`: Multiplicação de ponto flutuante
+- `DIVD Fd, Fs1, Fs2`: Divisão de ponto flutuante
+- `LD Fd, offset(Rs)`: Load da memória
+- `SD Fs, offset(Rd)`: Store na memória
+
+**Observações:**
+- Registradores são nomeados como `F0-F31` (ponto flutuante) ou `R0-R31` (inteiros)
+- Comentários iniciam com `#`
+- Linhas em branco são ignoradas
+
+## 📊 Formato da Saída
+
+A saída mostra o estado do simulador a cada ciclo:
+
+```
+--- INICIANDO CICLO 4 ---
+ > EXECUTED: ADD.D (Tag: 1) - Resultado (12.00) pronto.
+ > WRITE RESULT: Tag 1 valor (12.00) no CDB.
+  > ISSUED: SUB.D (Dest ROB Tag: 3)
+
+==================================================
+CICLO 4
+==================================================
+--- ESTAÇÕES DE RESERVA ---
+ID  Ocupado   Op       Qj     Qk     Vj     Vk     Dest   Ciclos
+A1  SIM       SUB.D    2      -      0.00   2.00   3      0
+M1  SIM       MUL.D    -      -      12.00  12.00  2      0
+
+--- BUFFER DE REORDENAÇÃO (ROB) ---
+ID  Ocupado   Estado        Destino Valor Endereço
+1   SIM       Pronto        F8      12.00
+2   SIM       Issue         F10     0.00
+3   SIM       Issue         F12     0.00
+
+--- STATUS DOS REGISTRADORES (Tags do ROB) ---
+Reg  Tag
+F8   1
+F10  2
+F12  3
+```
+
+### Interpretação da Saída
+
+**Estações de Reserva:**
+- **ID**: Identificador da estação (A=ADD/SUB, M=MUL/DIV, L=LOAD, S=STORE)
+- **Ocupado**: Se a estação está em uso
+- **Op**: Operação sendo executada
+- **Qj/Qk**: Tags das instruções que produzirão os operandos (0 = pronto)
+- **Vj/Vk**: Valores dos operandos
+- **Dest**: Tag do ROB de destino
+- **Ciclos**: Ciclos restantes de execução
+
+**Buffer de Reordenação (ROB):**
+- **ID**: Número da entrada no ROB (usado como tag)
+- **Ocupado**: Se a entrada está em uso
+- **Estado**: Issue, Executando, Pronto, ou Commit
+- **Destino**: Registrador que receberá o valor (ou Mem para stores)
+- **Valor**: Resultado da operação
+
+**Status dos Registradores:**
+- Mostra quais registradores estão esperando valores
+- **Tag**: Número do ROB que produzirá o valor
+
+## 🎓 Conceitos Implementados
+
+### Renomeação de Registradores
+
+O simulador implementa renomeação implícita usando as entradas do ROB como "registradores temporários":
+
+```
+1. ADD.D F1, F2, F3    # F1.Tag = ROB[1]
+2. MUL.D F4, F1, F5    # F4 espera ROB[1], não F1 diretamente
+3. SUB.D F1, F6, F7    # F1.Tag = ROB[3] (nova renomeação)
+```
+
+Instrução 2 continua "ouvindo" ROB[1], sem conflito com a instrução 3.
+
+### Resolução de Dependências
+
+- **RAW (Read After Write)**: Resolvida via CDB e tags
+- **WAR (Write After Read)**: Eliminada pela renomeação
+- **WAW (Write After Write)**: Eliminada pela renomeação
+
+### Common Data Bus (CDB)
+
+- Apenas uma transmissão por ciclo (recurso limitado)
+- Broadcast simultâneo para todas as unidades
+- Atualiza estações de reserva e ROB
+
+## 📈 Exemplos de Uso
+
+### Exemplo 1: Programa Simples
+
+**Entrada (input_simple.txt):**
+```
+CONFIG_BEGIN
+CYCLES ADDD 2
+CYCLES MULTD 4
+UNITS ADDD 1
+UNITS MULTD 1
+CONFIG_END
+
+INSTRUCTIONS_BEGIN
+ADDD F8 F4 F6
+MULTD F10 F8 F8
+SUBD F12 F10 F4
+INSTRUCTIONS_END
+```
+
+**Valores Iniciais Assumidos:**
+- F4 = 2.0
+- F6 = 10.0
+
+**Resultados Esperados:**
+- F8 = 12.0 (2 + 10)
+- F10 = 144.0 (12 × 12)
+- F12 = 142.0 (144 - 2)
+
+**Execução:**
+```bash
+./tomasulo_simulator input_simple.txt output_simple.txt
+```
+
+**Métricas:**
+- Total de ciclos: 13
+- IPC: 0.23 (3 instruções / 13 ciclos)
+
+### Exemplo 2: Dependências Complexas
+
+**Entrada (input_complex.txt):**
+```
+INSTRUCTIONS_BEGIN
+ADDD F1 F2 F3    # Independente
+ADDD F4 F5 F6    # Independente (pode executar em paralelo)
+MULTD F7 F1 F4   # Depende de ambas as ADDs
+INSTRUCTIONS_END
+```
+
+Este exemplo demonstra paralelismo: as duas ADDs executam simultaneamente.
+
+## 🔧 Decisões de Design
+
+### Inicialização de Registradores
+
+Por padrão, todos os registradores são inicializados com valores arbitrários:
+- Registradores FP: 1.0 (exceto fontes das instruções)
+- F4 = 2.0
+- F6 = 10.0
+- R1 = 1000.0 (base para LOAD/STORE)
+- R2 = 2000.0 (base para LOAD/STORE)
+
+### Latências Padrão
+
+Se não especificadas no arquivo, as latências assumidas são:
+- ADD/SUB: 2 ciclos
+- MUL: 4 ciclos
+- DIV: 10 ciclos
+- LOAD: 2 ciclos
+- STORE: 2 ciclos
+
+### Tamanho do ROB
+
+Fixado em 16 entradas (ROB_SIZE = 16).
+
+### Número de Registradores
+
+32 registradores de ponto flutuante (F0-F31).
+
+## 🐛 Tratamento de Erros
+
+O simulador detecta e reporta:
+- ❌ Arquivo de entrada não encontrado
+- ❌ Arquivo de saída não pode ser criado
+- ❌ Instruções inválidas (ignoradas com aviso)
+- ❌ Deadlock potencial (simulação abortada após 500 ciclos)
+
+## 📚 Referências
+
+- Hennessy, J. L., & Patterson, D. A. (2017). *Computer Architecture: A Quantitative Approach* (6th ed.). Morgan Kaufmann.
+- Tomasulo, R. M. (1967). "An Efficient Algorithm for Exploiting Multiple Arithmetic Units". *IBM Journal of Research and Development*, 11(1), 25-33.
+- Slides da disciplina de Arquitetura de Computadores
+
+## 👥 Autores
+
+- **[Lucas Barros, Julia Brito, Paulo Dimas e Talita Justo]** - Desenvolvimento e implementação
+
+## 📄 Licença
+
+Este projeto é disponibilizado sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+## 🙏 Agradecimentos
+
+- Professor [Mateus de Alcantara] pela orientação
+- Colegas de turma pelas discussões sobre o algoritmo
+- Comunidade open-source pelas ferramentas utilizadas
 
 ---
 
-### Versão Curta (para a descrição do repositório no GitHub)
+**Desenvolvido como projeto acadêmico para a disciplina de Arquitetura de Computadores**
 
-**Campo "About" do GitHub (160 caracteres max)**:
-```
-C++ simulator implementing Tomasulo's algorithm for dynamic instruction scheduling in superscalar processors. Educational project.
-```
-
-**Ou mais curto ainda**:
-```
-Tomasulo algorithm simulator in C++ - Out-of-order execution with register renaming
-```
-
-**Ou focado em aprendizado**:
-```
-Computer Architecture project: Tomasulo's algorithm implementation for superscalar processor simulation
-```
-
----
-
-## 3. Tags/Topics Sugeridas
-
-Adicione essas tags ao repositório (aparecem na busca do GitHub):
-```
-tomasulo
-computer-architecture
-superscalar
-out-of-order-execution
-instruction-scheduling
-cpu-simulator
-register-renaming
-cpp
-educational
-academic-project
-processor-simulation
-ilp
-dynamic-scheduling
+Data: Novembro/2025
